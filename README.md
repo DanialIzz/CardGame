@@ -11,7 +11,7 @@ No | ID         | Name                           | Task descriptions | Contribut
 1  | 1211310715 |   Doaa Abdelmoneim Noah        |  task 3 and 4     |25%
 2  | 1221302663 |   AlHalah Raed                 |  task 2 and 8     |25%
 3  | 1221303139 |  Muhammad Danish Tan           |   task 6 and 7    |25%
-4  |1221303348  | Izzat Danial Bin Mohamed Yusof |  task 1 and 5     |25%
+4  |1221303348  | Izzat Danial Bin Mohamad Yusof |  task 1 and 5     |25%
 
 
 ## B. Feature Completion
