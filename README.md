@@ -5,8 +5,9 @@ GoBoom CardGame OOPDS assignment . Our group consists of four people : Muhammad 
 
 ## A. Member Contributions
 
+
 No | ID         | Name                           | Task descriptions | Contribution %
--- | ---------- | -------------------------------| --------------    |
+-- | ---------- | -------------------------------| --------------    |-------------- 
 1  | 1211310715 |   Doaa Abdelmoneim Noah        |  task 3 and 4     |25%
 2  | 1221302663 |   AlHalah Raed                 |  task 2 and 8     |25%
 3  | 1221303139 |  Muhammad Danish Tan           |   task 6 and 7    |25%
