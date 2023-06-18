@@ -1,11 +1,10 @@
 import java.io.*;
 import java.util.*;
-import javax.swing.*;
 
-public class cardgame2 implements Serializable {
+public class cardgame implements Serializable {
     private List<Card> deck;
 
-    public cardgame2() {
+    public cardgame() {
         deck = new ArrayList<>();
     }
 
@@ -56,12 +55,12 @@ public class cardgame2 implements Serializable {
         }
     }
 
-    public static cardgame2 loadGame(String fileName) {
-        cardgame2 game = null;
+    public static cardgame loadGame(String fileName) {
+        cardgame game = null;
         try {
             FileInputStream fileIn = new FileInputStream(fileName);
             ObjectInputStream in = new ObjectInputStream(fileIn);
-            game = (cardgame2) in.readObject();
+            game = (cardgame) in.readObject();
             in.close();
             fileIn.close();
             System.out.println("Game loaded successfully.");
@@ -72,16 +71,16 @@ public class cardgame2 implements Serializable {
     }
 
     public static void main(String[] args) {
-        cardgame2 game;
+        cardgame game;
 
         // Check if a saved game file exists
         File savedGameFile = new File("saved_game.dat");
         if (savedGameFile.exists()) {
             // Load the saved game
-            game = cardgame2.loadGame("saved_game.dat");
+            game = cardgame.loadGame("saved_game.dat");
         } else {
             // Create a new game
-            game = new cardgame2();
+            game = new cardgame();
             game.generateDeck();
             game.shuffleDeck();
         }
@@ -112,199 +111,87 @@ public class cardgame2 implements Serializable {
 
         System.out.println("Deck: " + remainingCards);
 
-        String firstPlayer = "";
-        switch (firstCard.getRank()) {
-            case "A":
-            case "5":
-            case "9":
-            case "K":
-                firstPlayer = "Player 1";
-                break;
-            case "2":
-            case "6":
-                firstPlayer = "Player 2";
-                break;
-            case "3":
-            case "7":
-            case "J":
-                firstPlayer = "Player 3";
-                break;
-            case "4":
-            case "8":
-            case "Q":
-                firstPlayer = "Player 4";
-                break;
-        }
-        System.out.println("Turn: " + firstPlayer);
+        int currentWinnerIndex = 0;
 
-        int currentPlayerIndex = 0;
-        Card highestCard = firstCard;
-        String trickWinner = firstPlayer;
+        for (int trick = 1; trick <= 5; trick++) {
+            System.out.println("Trick " + trick + ":");
+            List<Card> trickCards = new ArrayList<>();
+            List<Card> currentHand;
+            boolean deckExhausted = false;
 
-        while (true) {
-            System.out.println("\nNext Player Turn");
-
-            List<Card> currentPlayerHand = playersHands.get(currentPlayerIndex);
-
-            Card playableCard = null;
-            for (Card card : currentPlayerHand) {
-                if (isPlayableCard(card, highestCard)) {
-                    if (playableCard == null || getCardValue(card.getRank()) > getCardValue(playableCard.getRank())) {
-                        playableCard = card;
-                    }
-                }
-            }
-
-            if (playableCard != null) {
-                currentPlayerHand.remove(playableCard);
-                highestCard = playableCard;
-                trickWinner = "Player " + (currentPlayerIndex + 1);
-                System.out.println("Player " + (currentPlayerIndex + 1) + " plays: " + playableCard.toString());
-            } else {
-                System.out.println("Player " + (currentPlayerIndex + 1) + " draws a card and skips the turn");
-
-                currentPlayerIndex = (currentPlayerIndex + 1) % numPlayers;
-
-                if (currentPlayerIndex == 0) {
-                    // Save the game
-                    game.saveGame("saved_game.dat");
-                    break;
+            for (int i = 0; i < numPlayers; i++) {
+                currentHand = playersHands.get(i);
+                if (currentHand.isEmpty()) {
+                    System.out.println("Player " + (i + 1) + " has no cards remaining.");
+                    continue;
                 }
 
-                continue;
+                Card playedCard;
+                if (i == currentWinnerIndex) {
+                    playedCard = firstCard;
+                } else {
+                    playedCard = drawValidCard(currentHand, remainingCards, firstCard);
+                }
+
+                trickCards.add(playedCard);
+                currentHand.remove(playedCard);
+
+                System.out.println("Player " + (i + 1) + " plays: " + playedCard);
             }
 
-            if (currentPlayerIndex == 3) {
-                trickWinner = "Player " + (currentPlayerIndex + 1);
-                highestCard = playableCard;
-                break;
-            }
-
-            currentPlayerIndex = (currentPlayerIndex + 1) % numPlayers;
+            currentWinnerIndex = getTrickWinnerIndex(trickCards, firstCard.getSuit());
+            System.out.println("Trick " + trick + " winner: Player " + (currentWinnerIndex + 1));
         }
 
-        System.out.println("\nTrick ended!");
-        System.out.println("Trick winner: " + trickWinner + " with the highest card: " + highestCard.toString());
-
-        System.out.println("\nStarting a next trick with " + trickWinner + " as the first player");
-
-        int winnerIndex = Integer.parseInt(trickWinner.split(" ")[1]) - 1;
-
-        Collections.rotate(playersHands, -winnerIndex);
-
-        highestCard = gameDeck.get(0);
-
-        currentPlayerIndex = 0;
-
-        while (true) {
-            System.out.println("\nNext Player Turn");
-
-            List<Card> currentPlayerHand = playersHands.get(currentPlayerIndex);
-
-            // Check if player has a valid card to play
-            Card playableCard = null;
-            for (Card card : currentPlayerHand) {
-                if (isPlayableCard(card, highestCard)) {
-                    if (playableCard == null || getCardValue(card.getRank()) > getCardValue(playableCard.getRank())) {
-                        playableCard = card;
-                    }
-                }
-            }
-
-            if (playableCard != null) {
-                currentPlayerHand.remove(playableCard);
-                highestCard = playableCard;
-                trickWinner = "Player " + (currentPlayerIndex + 1);
-                System.out.println("Player " + (currentPlayerIndex + 1) + " plays: " + playableCard.toString());
-            } else {
-                System.out.println("Player " + (currentPlayerIndex + 1) + " draws a card and skips the turn");
-
-                currentPlayerIndex = (currentPlayerIndex + 1) % numPlayers;
-
-                if (currentPlayerIndex == 0) {
-                    // Save the game
-                    game.saveGame("saved_game.dat");
-                    break;
-                }
-
-                continue;
-            }
-
-            if (currentPlayerIndex == 3) {
-                trickWinner = "Player " + (currentPlayerIndex + 1);
-                highestCard = playableCard;
-                break;
-            }
-
-            currentPlayerIndex = (currentPlayerIndex + 1) % numPlayers;
-        }
-
-        System.out.println("\nTrick ended!");
-        System.out.println("Trick winner: " + trickWinner + " with the highest card: " + highestCard.toString());
+        game.saveGame("saved_game.dat");
     }
 
-    public static boolean isPlayableCard(Card card, Card centerCard) {
-        String cardRank = card.getRank();
-        String centerRank = centerCard.getRank();
-
-        if (cardRank.equals("2") || cardRank.equals("J")) {
-            return true;
+    private static Card drawValidCard(List<Card> hand, List<Card> deck, Card leadCard) {
+        for (int i = 0; i < hand.size(); i++) {
+            Card card = hand.get(i);
+            if (card.getSuit().equals(leadCard.getSuit()) || card.getRank().equals(leadCard.getRank())) {
+                return hand.remove(i);
+            }
         }
-
-        if (cardRank.equals("A") && (centerRank.equals("A") || centerRank.equals("K"))) {
-            return true;
+        // If no valid card is found, draw from the deck
+        if (!deck.isEmpty()) {
+            Card drawnCard = deck.remove(0);
+            hand.add(drawnCard);
+            System.out.println("Player drew a card: " + drawnCard);
+            return drawnCard;
+        } else {
+            System.out.println("Deck is exhausted, cannot draw a card.");
+            return null; // or return a placeholder card indicating inability to play
         }
+    }
 
-        if (cardRank.equals("K") && centerRank.equals("A")) {
-            return true;
+    private static boolean hasCardWithSuit(List<Card> hand, String suit) {
+        for (Card card : hand) {
+            if (card.getSuit().equals(suit)) {
+                return true;
+            }
         }
-
-        if (cardRank.equals("5") && (centerRank.equals("5") || centerRank.equals("9"))) {
-            return true;
-        }
-
-        if (cardRank.equals("9") && centerRank.equals("5")) {
-            return true;
-        }
-
-        if (cardRank.equals("Q") && centerRank.equals("8")) {
-            return true;
-        }
-
         return false;
     }
 
-    public static int getCardValue(String rank) {
-        switch (rank) {
-            case "A":
-                return 14;
-            case "K":
-                return 13;
-            case "Q":
-                return 12;
-            case "J":
-                return 11;
-            case "9":
-                return 9;
-            case "8":
-                return 8;
-            case "7":
-                return 7;
-            case "6":
-                return 6;
-            case "5":
-                return 5;
-            case "4":
-                return 4;
-            case "3":
-                return 3;
-            case "2":
-                return 2;
-            default:
-                return 0;
+    private static int getTrickWinnerIndex(List<Card> trickCards, String suit) {
+        int currentWinnerIndex = 0;
+        Card currentHighestCard = trickCards.get(0);
+
+        for (int i = 1; i < trickCards.size(); i++) {
+            Card card = trickCards.get(i);
+            if (card.getSuit().equals(suit)) {
+                if (card.getRank().compareTo(currentHighestCard.getRank()) > 0) {
+                    currentHighestCard = card;
+                    currentWinnerIndex = i;
+                }
+            }
         }
+
+        return currentWinnerIndex;
     }
 }
+
 
 class Card implements Serializable {
     private String rank;
@@ -325,6 +212,6 @@ class Card implements Serializable {
 
     @Override
     public String toString() {
-        return rank + suit;
-    }
+        return rank + suit;
+    }
 }
