@@ -1,10 +1,10 @@
 import java.io.*;
 import java.util.*;
 
-public class cardgame implements Serializable {
+public class cardgame2 implements Serializable {
     private List<Card> deck;
 
-    public cardgame() {
+    public cardgame2() {
         deck = new ArrayList<>();
     }
 
@@ -55,12 +55,12 @@ public class cardgame implements Serializable {
         }
     }
 
-    public static cardgame loadGame(String fileName) {
-        cardgame game = null;
+    public static cardgame2 loadGame(String fileName) {
+        cardgame2 game = null;
         try {
             FileInputStream fileIn = new FileInputStream(fileName);
             ObjectInputStream in = new ObjectInputStream(fileIn);
-            game = (cardgame) in.readObject();
+            game = (cardgame2) in.readObject();
             in.close();
             fileIn.close();
             System.out.println("Game loaded successfully.");
@@ -71,16 +71,16 @@ public class cardgame implements Serializable {
     }
 
     public static void main(String[] args) {
-        cardgame game;
+        cardgame2 game;
 
         // Check if a saved game file exists
         File savedGameFile = new File("saved_game.dat");
         if (savedGameFile.exists()) {
             // Load the saved game
-            game = cardgame.loadGame("saved_game.dat");
+            game = cardgame2.loadGame("saved_game.dat");
         } else {
             // Create a new game
-            game = new cardgame();
+            game = new cardgame2();
             game.generateDeck();
             game.shuffleDeck();
         }
@@ -212,6 +212,6 @@ class Card implements Serializable {
 
     @Override
     public String toString() {
-        return rank + suit;
-    }
+        return rank + suit;
+  }
 }
