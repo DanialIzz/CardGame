@@ -89,5 +89,5 @@ No | Feature                                                                    
 
 ## D. Link to Part 2 GitHub Repo
 
-https://link_to_your_GitHub_repo
+(https://github.com/DanialIzz/CardGame)
 
